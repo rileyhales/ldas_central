@@ -143,10 +143,9 @@ def nc_to_gtiff(data):
     allfiles = os.listdir(path)
     if tperiod == 'alltimes':
         files = [nc for nc in allfiles if nc.startswith("GLDAS_NOAH025_M.A")]
-        files.sort()
     else:
         files = [nc for nc in allfiles if nc.startswith("GLDAS_NOAH025_M.A" + str(tperiod))]
-        files.sort()
+    files.sort()
 
     # Remove old geotiffs before filling it
     geotiffdir = os.path.join(App.get_app_workspace().path, 'geotiffs')
@@ -204,7 +203,6 @@ def rastermask_average_gdalwarp(data):
     Returns: mean value of an array within a shapefile's boundaries
     Author: Riley Hales, RCH Engineering, April 2019
     """
-
     values = []
     times = data['times']
     times.sort()
@@ -213,28 +211,10 @@ def rastermask_average_gdalwarp(data):
 
     if data['shapefile'] == 'true':
         region = data['region']
-        shppath = os.path.join(wrkpath, 'shapefiles', region, region.replace(' ', '') + '.shp')
+        shppath = os.path.join(wrkpath, 'shapefiles', region, region.replace(' ', '').lower() + '.shp')
     else:
         # todo: still under development- turn a geojson into a shapefile
-        import shapefile
-        from pyproj import Proj, transform
-        # convert the geojson to a shapefile object
-        coords = data['coords'][0]
-        shape = shapefile.Writer(shppath, shapeType=shapefile.POLYGON, shp=coords)
-        shape.close()
-
-        driver = ogr.GetDriverByName('ESRI Shapefile')
-        srs = osr.SpatialReference().ImportFromEPSG(4326)
-        print(srs)
-        datasource = driver.CreateDataSource(shppath)
-        polygon = ogr.CreateGeometryFromJson(json.dumps(data['geojson']))
-        fieldDefn_ = ogr.FieldDefn('id', ogr.OFTInteger)
-        layer = datasource.CreateLayer('polygon', srs, ogr.wkbPolygon)
-        layer.CreateField(fieldDefn_)
-        feature = ogr.Feature(layer.GetLayerDefn())
-        feature.SetGeometry(polygon)
-        feature.SetField('id', 1)
-        layer.CreateFeature(feature)
+        print('you can\'t do that')
 
     # setup the working directories for the geoprocessing
     geotiffdir = os.path.join(wrkpath, 'geotiffs')

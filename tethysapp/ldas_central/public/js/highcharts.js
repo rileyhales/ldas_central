@@ -102,7 +102,7 @@ function getDrawnChart(drawnItems) {
         // call the right timeseries generator function based on type
         if (drawtype === 'Polygon') {
             $.ajax({
-                url: '/apps/gldas/ajax/getPolygonAverage/',
+                url: '/apps/ldas-central/ajax/getPolygonAverage/',
                 data: JSON.stringify(data),
                 dataType: 'json',
                 contentType: "application/json",
@@ -113,7 +113,7 @@ function getDrawnChart(drawnItems) {
             })
         } else if (drawtype === 'Point') {
             $.ajax({
-                url: '/apps/gldas/ajax/getPointSeries/',
+                url: '/apps/ldas-central/ajax/getPointSeries/',
                 data: JSON.stringify(data),
                 dataType: 'json',
                 contentType: "application/json",
@@ -139,13 +139,12 @@ function getShapeChart() {
         region: $("#regions").val(),
     };
     $.ajax({
-        url: '/apps/gldas/ajax/getShapeAverage/',
+        url: '/apps/ldas-central/ajax/getShapeAverage/',
         data: JSON.stringify(data),
         dataType: 'json',
         contentType: "application/json",
         method: 'POST',
         success: function (result) {
-            console.log(result);
             newHighchart(result);
         }
     })

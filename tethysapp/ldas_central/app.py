@@ -16,7 +16,7 @@ class LdasCentral(TethysAppBase):
     tags = ''
     enable_feedback = False
     feedback_emails = []
-    version = 'Version 1.0.0 - 14 May 2019'
+    version = 'Version 1.0.1 - 14 May 2019'
 
     def url_maps(self):
         """
