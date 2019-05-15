@@ -4,7 +4,7 @@ from tethys_sdk.app_settings import CustomSetting
 
 class LdasCentral(TethysAppBase):
     """
-    Tethys app class for LDAS Data Visualizer   Central America.
+    Tethys app class for LDAS Data Visualizer - Central America.
     """
     name = 'LDAS Data Visualizer - Central America'
     index = 'ldas_central:home'

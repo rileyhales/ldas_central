@@ -1,12 +1,17 @@
 ////////////////////////////////////////////////////////////////////////  MAP VARIABLES
-let africa = L.geoJSON();
-let asia = L.geoJSON();
-let australia = L.geoJSON();
+let belize = L.geoJSON();
+let costarica = L.geoJSON();
+let cuba = L.geoJSON();
 let centralamerica = L.geoJSON();
-let europe = L.geoJSON();
-let middleeast = L.geoJSON();
-let northamerica = L.geoJSON();
-let southamerica = L.geoJSON();
+let dominicanrepublic = L.geoJSON();
+let elsalvador = L.geoJSON();
+let guatemala = L.geoJSON();
+let haiti = L.geoJSON();
+let honduras = L.geoJSON();
+let jamaica = L.geoJSON();
+let mexico = L.geoJSON();
+let nicaragua = L.geoJSON();
+let panama = L.geoJSON();
 
 ////////////////////////////////////////////////////////////////////////  MAP FUNCTIONS
 function map() {
@@ -97,50 +102,72 @@ function getWFSData(geoserverlayer, leafletlayer) {
 }
 
 function updateGEOJSON() {
-    getWFSData('africa', africa);
-    getWFSData('asia', asia);
-    getWFSData('australia', australia);
+    getWFSData('belize', belize);
+    getWFSData('costarica', costarica);
+    getWFSData('cuba', cuba);
     getWFSData('centralamerica', centralamerica);
-    getWFSData('europe', europe);
-    getWFSData('middleeast', middleeast);
-    getWFSData('northamerica', northamerica);
-    getWFSData('southamerica', southamerica);
+    getWFSData('dominicanrepublic', dominicanrepublic);
+    getWFSData('elsalvador', elsalvador);
+    getWFSData('guatemala', guatemala);
+    getWFSData('haiti', haiti);
+    getWFSData('honduras', honduras);
+    getWFSData('jamaica', jamaica);
+    getWFSData('mexico', mexico);
+    getWFSData('nicaragua', nicaragua);
+    getWFSData('panama', panama);
 }
 
 function makeControls() {
     return L.control.layers(basemapObj, {
         'GLDAS Layer': layerObj,
         'Drawing': drawnItems,
-        'Europe': europe,
-        'Asia': asia,
-        'Middle East': middleeast,
-        'North America': northamerica,
+        'Belize': belize,
+        'Costa Rica': costarica,
+        'Cuba': cuba,
         'Central America': centralamerica,
-        'South America': southamerica,
-        'Africa': africa,
-        'Australia': australia,
+        'Dominican Republic': dominicanrepublic,
+        'El Salvador': elsalvador,
+        'Guatemala': guatemala,
+        'Haiti': haiti,
+        'Honduras': honduras,
+        'Jamaica': jamaica,
+        'Mexico': mexico,
+        'Nicaragua': nicaragua,
+        'Panama': panama,
     }).addTo(mapObj);
 }
 
 function clearMap() {
     controlsObj.removeLayer(layerObj);
     controlsObj.removeLayer(africa);
-    controlsObj.removeLayer(asia);
-    controlsObj.removeLayer(australia);
-    controlsObj.removeLayer(northamerica);
+    controlsObj.removeLayer(belize);
+    controlsObj.removeLayer(costarica);
+    controlsObj.removeLayer(cuba);
     controlsObj.removeLayer(centralamerica);
-    controlsObj.removeLayer(southamerica);
-    controlsObj.removeLayer(europe);
-    controlsObj.removeLayer(middleeast);
+    controlsObj.removeLayer(dominicanrepublic);
+    controlsObj.removeLayer(elsalvador);
+    controlsObj.removeLayer(guatemala);
+    controlsObj.removeLayer(haiti);
+    controlsObj.removeLayer(honduras);
+    controlsObj.removeLayer(jamaica);
+    controlsObj.removeLayer(mexico);
+    controlsObj.removeLayer(nicaragua);
+    controlsObj.removeLayer(panama);
     mapObj.removeLayer(layerObj);
     mapObj.removeLayer(africa);
-    mapObj.removeLayer(asia);
-    mapObj.removeLayer(australia);
-    mapObj.removeLayer(northamerica);
+    mapObj.removeLayer(belize);
+    mapObj.removeLayer(costarica);
+    mapObj.removeLayer(cuba);
     mapObj.removeLayer(centralamerica);
-    mapObj.removeLayer(southamerica);
-    mapObj.removeLayer(europe);
-    mapObj.removeLayer(middleeast);
+    mapObj.removeLayer(dominicanrepublic);
+    mapObj.removeLayer(elsalvador);
+    mapObj.removeLayer(guatemala);
+    mapObj.removeLayer(haiti);
+    mapObj.removeLayer(honduras);
+    mapObj.removeLayer(jamaica);
+    mapObj.removeLayer(mexico);
+    mapObj.removeLayer(nicaragua);
+    mapObj.removeLayer(panama);
     mapObj.removeControl(controlsObj);
 }
 
