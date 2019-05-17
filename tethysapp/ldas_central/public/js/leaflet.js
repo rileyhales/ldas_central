@@ -5,7 +5,7 @@ function map() {
         zoom: 6,
         minZoom: 5,
         boxZoom: true,
-        maxBounds: L.latLngBounds(L.latLng(0, -100), L.latLng(40, -60)),
+        maxBounds: L.latLngBounds(L.latLng(0, -100), L.latLng(30, -60)),
         center: [13, -86],
         timeDimension: true,
         timeDimensionControl: true,
