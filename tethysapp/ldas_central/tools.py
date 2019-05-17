@@ -8,7 +8,6 @@ import gdalnumeric
 import netCDF4
 import numpy
 import osr
-import ogr
 import statistics
 import pandas
 

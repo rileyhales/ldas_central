@@ -127,14 +127,3 @@ def get_charttypes():
         ('Yearly Analysis (Box Plot)', 'yearbox'),
         ('Yearly Analysis (Multi-Line Plot)', 'yearmulti'),
     ]
-
-
-def worldregions():
-    """
-    Populates the drop down menu with the list of available shapefiles to use for averaging
-    Dependencies: os, App (app)
-    """
-    folders = os.listdir(os.path.join(Gldas.get_app_workspace().path, 'shapefiles'))
-    options = [(folder, folder) for folder in folders if not folder.startswith('.')]
-    options.sort()
-    return options

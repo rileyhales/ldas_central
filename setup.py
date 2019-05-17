@@ -10,11 +10,11 @@ app_class = 'ldas_central.app:LdasCentral'
 app_package_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tethysapp', app_package)
 
 # -- Python Dependencies -- #
-dependencies = ['netCDF4', 'numpy', 'gdal', 'osr']
+dependencies = ['netCDF4', 'numpy', 'gdal', 'osr', 'pandas']
 
 setup(
     name=release_package,
-    version='1.0.1',
+    version='1.1.0',
     tags='',
     description='',
     long_description='',
