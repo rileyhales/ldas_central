@@ -8,8 +8,8 @@ import gdalnumeric
 import netCDF4
 import numpy
 import osr
-import ogr
-import json
+import statistics
+import pandas
 
 from .app import LdasCentral as App
 from .model import app_configuration
@@ -32,11 +32,11 @@ def pointchart(data):
     data_dir = configs['threddsdatadir']
 
     path = os.path.join(data_dir, 'raw')
+    allfiles = os.listdir(path)
     if tperiod == 'alltimes':
-        files = os.listdir(path)
+        files = [nc for nc in allfiles if nc.startswith("GLDAS_NOAH025_M.A")]
         files.sort()
     else:
-        allfiles = os.listdir(path)
         files = [nc for nc in allfiles if nc.startswith("GLDAS_NOAH025_M.A" + str(tperiod))]
         files.sort()
 
@@ -55,11 +55,13 @@ def pointchart(data):
         dataset = netCDF4.Dataset(path + '/' + nc, 'r')
         t_value = (dataset['time'].__dict__['begin_date'])
         t_step = datetime.datetime.strptime(t_value, "%Y%m%d")
+        month = t_step.month
+        year = t_step.year
         t_step = calendar.timegm(t_step.utctimetuple()) * 1000
         for time, var in enumerate(dataset['time'][:]):
             # get the value at the point
             val = float(dataset[variable][0, adj_lat_ind, adj_lon_ind].data)
-            values.append((t_step, val))
+            values.append((t_step, val, month, year))
         dataset.close()
 
     return units, values
@@ -75,20 +77,19 @@ def polychart(data):
     """
     values = []
     variable = str(data['variable'])
-    coords = data['coords'][0]          # 5x2 array 1 row of lat/lon per corner, 1st duplicated (start/stop)
+    coords = data['coords'][0]  # 5x2 array 1 row of lat/lon per corner, 1st duplicated (start/stop)
     tperiod = data['time']
 
     configs = app_configuration()
     data_dir = configs['threddsdatadir']
 
     path = os.path.join(data_dir, 'raw')
+    allfiles = os.listdir(path)
     if tperiod == 'alltimes':
-        files = os.listdir(path)
-        files.sort()
+        files = [nc for nc in allfiles if nc.startswith("GLDAS_NOAH025_M.A")]
     else:
-        allfiles = os.listdir(path)
         files = [nc for nc in allfiles if nc.startswith("GLDAS_NOAH025_M.A" + str(tperiod))]
-        files.sort()
+    files.sort()
 
     # find the point of data array that corresponds to the user's choice, get the units of that variable
     dataset = netCDF4.Dataset(os.path.join(path, str(files[0])), 'r')
@@ -108,6 +109,8 @@ def polychart(data):
         dataset = netCDF4.Dataset(path + '/' + nc, 'r')
         t_value = (dataset['time'].__dict__['begin_date'])
         t_step = datetime.datetime.strptime(t_value, "%Y%m%d")
+        month = t_step.month
+        year = t_step.year
         t_step = calendar.timegm(t_step.utctimetuple()) * 1000
         for time, var in enumerate(dataset['time'][:]):
             # get the value at the point
@@ -115,12 +118,10 @@ def polychart(data):
             array[array < -9000] = numpy.nan  # If you have fill values, change the comparator to git rid of it
             array = array.flatten()
             array = array[~numpy.isnan(array)]
-            values.append((t_step, float(array.mean())))
+            values.append((t_step, float(array.mean()), month, year))
         dataset.close()
 
-    return_items = [units, values]
-
-    return return_items
+    return units, values
 
 
 def nc_to_gtiff(data):
@@ -164,12 +165,12 @@ def nc_to_gtiff(data):
         # create the timesteps for the highcharts plot
         t_value = (nc_obj['time'].__dict__['begin_date'])
         t_step = datetime.datetime.strptime(t_value, "%Y%m%d")
-        times.append(calendar.timegm(t_step.utctimetuple()) * 1000)
+        times.append((calendar.timegm(t_step.utctimetuple()) * 1000, t_step.month, t_step.year))
 
         # format the array of information going to the tiff
         array = numpy.asarray(var_data)[0, :, :]
-        array[array < -9000] = numpy.nan                # change the comparator to git rid of the fill value
-        array = array[::-1]       # vertically flip the array so the orientation is right (you just have to, try it)
+        array[array < -9000] = numpy.nan  # change the comparator to git rid of the fill value
+        array = array[::-1]  # vertically flip the array so the orientation is right (you just have to, try it)
 
         # Creates geotiff raster file (filepath, x-dimensions, y-dimensions, number of bands, datatype)
         gtiffpath = os.path.join(geotiffdir, 'geotiff' + str(i) + '.tif')
@@ -187,8 +188,8 @@ def nc_to_gtiff(data):
         new_gtiff.SetProjection(osr.SRS_WKT_WGS84)
 
         # actually write the data array to the tiff file and save it
-        new_gtiff.GetRasterBand(1).WriteArray(array)      # write band to the raster (variable array)
-        new_gtiff.FlushCache()                            # write to disk
+        new_gtiff.GetRasterBand(1).WriteArray(array)  # write band to the raster (variable array)
+        new_gtiff.FlushCache()  # write to disk
     return times, units
 
 
@@ -197,12 +198,13 @@ def rastermask_average_gdalwarp(data):
     Description: A function to mask/clip a raster by the boundaries of a shapefile and computer the average value of the
         resulting raster
     Dependencies:
-        gdal, gdalnumeric, numpy, os, shutil, ogr, json
+        gdal, gdalnumeric, numpy, os, shutil, ogr
         from .app import Gldas as App
     Params: View README.md
     Returns: mean value of an array within a shapefile's boundaries
     Author: Riley Hales, RCH Engineering, April 2019
     """
+
     values = []
     times = data['times']
     times.sort()
@@ -211,7 +213,7 @@ def rastermask_average_gdalwarp(data):
 
     if data['shapefile'] == 'true':
         region = data['region']
-        shppath = os.path.join(wrkpath, 'shapefiles', region, region.replace(' ', '').lower() + '.shp')
+        shppath = os.path.join(wrkpath, 'shapefiles', region, region.replace(' ', '') + '.shp')
     else:
         # todo: still under development- turn a geojson into a shapefile
         print('you can\'t do that')
@@ -231,9 +233,44 @@ def rastermask_average_gdalwarp(data):
         array = array.flatten()
         array = array[~numpy.isnan(array)]
         mean = array.mean()
-        values.append((times[i], float(mean)))
+        values.append((times[i][0], float(mean), times[i][1], times[i][2]))
 
     if os.path.isdir(geotiffdir):
         shutil.rmtree(geotiffdir)
 
     return values
+
+
+def makestatplots(data):
+    """
+    Calculates statistics for the array of timeseries values and returns arrays for a highcharts boxplot
+    Dependencies: statistics, pandas, datetime
+    """
+    df = pandas.DataFrame(data['values'], columns=['dates', 'values', 'month', 'year'])
+    data['multiline'] = {'yearmulti': {'min': [], 'max': [], 'mean': []},
+                         'monthmulti': {'min': [], 'max': [], 'mean': []}}
+    data['boxplot'] = {'yearbox': [], 'monthbox': []}
+
+    if data['time'] == 'alltimes':
+        for i in range(1, 13):
+            tmp = df[df['month'] == i]['values']
+            std = statistics.stdev(tmp)
+            ymin = min(tmp)
+            ymax = max(tmp)
+            mean = sum(tmp) / len(tmp)
+            data['boxplot']['monthbox'].append([i, ymin, mean - std, mean, mean + std, ymax])
+            data['multiline']['monthmulti']['min'].append((i + 2000, ymin))
+            data['multiline']['monthmulti']['mean'].append((i + 2000, mean))
+            data['multiline']['monthmulti']['max'].append((i + 2000, ymax))
+        for i in range(20):
+            tmp = df[df['year'] == i + 2000]['values']
+            std = statistics.stdev(tmp)
+            ymin = min(tmp)
+            ymax = max(tmp)
+            mean = sum(tmp) / len(tmp)
+            data['boxplot']['yearbox'].append([i, ymin, mean - std, mean, mean + std, ymax])
+            data['multiline']['yearmulti']['min'].append((i + 2000, ymin))
+            data['multiline']['yearmulti']['mean'].append((i + 2000, mean))
+            data['multiline']['yearmulti']['max'].append((i + 2000, ymax))
+
+    return data

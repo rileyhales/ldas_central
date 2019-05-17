@@ -18,7 +18,7 @@ $.ajaxSetup({
 ////////////////////////////////////////////////////////////////////////  AJAX FUNCTIONS
 function getThreddswms() {
     $.ajax({
-        url: '/apps/gldas/ajax/customsettings/',
+        url: '/apps/ldas-central/ajax/customsettings/',
         async: false,
         data: '',
         dataType: 'json',
@@ -32,14 +32,13 @@ function getThreddswms() {
 }
 
 ////////////////////////////////////////////////////////////////////////  LOAD THE MAP
-//  Load initial map data as soon as the page is ready
 let threddsbase;
 let geoserverbase;
 getThreddswms();                        // sets the value of threddsbase and geoserverbase
 const mapObj = map();                   // used by legend and draw controls
 const basemapObj = basemaps();          // used in the make controls function
 
-////////////////////////////////////////////////////////////////////////  DRAWING/LAYER CONTROLS, LEGEND
+////////////////////////////////////////////////////////////////////////  DRAWING/LAYER CONTROLS, MAP EVENTS, LEGEND
 let drawnItems = new L.FeatureGroup().addTo(mapObj);      // FeatureGroup is to store editable layers
 let drawControl = new L.Control.Draw({
     edit: {
@@ -64,10 +63,14 @@ mapObj.on(L.Draw.Event.CREATED, function (event) {
     getDrawnChart(drawnItems);
 });
 
+mapObj.on("mousemove", function (event) {
+    $("#mouse-position").html('Lat: ' + event.latlng.lat.toFixed(5) + ', Lon: ' + event.latlng.lng.toFixed(5));
+});
+
 let layerObj = newLayer();              // adds the wms raster layer
 let controlsObj = makeControls();       // the layer toggle controls top-right corner
 legend.addTo(mapObj);                   // add the legend graphic to the map
-updateGEOJSON();                        // asynchronously get geoserver wfs data for the regions
+updateGEOJSON();                        // asynchronously get geoserver wfs/geojson data for the regions
 
 ////////////////////////////////////////////////////////////////////////  EVENT LISTENERS
 $("#dates").change(function () {
@@ -86,25 +89,37 @@ $("#variables").change(function () {
     legend.addTo(mapObj);
 });
 
-$("#opacity").change(function () {
-    layerObj.setOpacity($('#opacity').val());
+$("#opacity_raster").change(function () {
+    layerObj.setOpacity($('#opacity_raster').val());
 });
 
-$('#colors').change(function () {
+$('#colorscheme').change(function () {
     clearMap();
     layerObj = newLayer();
     controlsObj = makeControls();
     legend.addTo(mapObj);
 });
 
-$("#shpaverage").click(function () {
-    if ($("#dates").val() === 'alltimes') {
-        if (confirm("Computing a timeseries of spatial average data requires over 200 iterations of file conversions and geoprocessing operations. This may result in a long wait (about 20 seconds) or cause errors. Are you sure you want to continue?")) {
-            drawnItems.clearLayers();
-            getShapeChart();
-        }
-    } else {
-        drawnItems.clearLayers();
-        getShapeChart();
-    }
+$("#opacity_geojson").change(function () {
+    styleGeoJSON();
+});
+
+$('#colors_geojson').change(function () {
+    styleGeoJSON();
+});
+
+$('#colors_geojson').change(function () {
+    styleGeoJSON();
+});
+
+$('#charttype').change(function () {
+    makechart();
+});
+
+$("#datatoggle").click(function() {
+    $("#datacontrols").toggle();
+});
+
+$("#displaytoggle").click(function() {
+    $("#displaycontrols").toggle();
 });

@@ -1,5 +1,19 @@
-from .app import LdasCentral
+from .app import LdasCentral as App
 import os
+
+
+def app_configuration():
+    """
+    Gets the settings for the app for use in other functions and ajax for leaflet
+    Dependencies: os, App (app)
+    """
+    return {
+        'app_wksp_path': os.path.join(App.get_app_workspace().path, ''),
+        'threddsurl': App.get_custom_setting("Thredds WMS URL"),
+        'geoserverurl': App.get_custom_setting("Geoserver Workspace URL"),
+        'threddsdatadir': App.get_custom_setting("Local Thredds Folder Path"),
+    }
+
 
 def gldas_variables():
     """
@@ -41,27 +55,6 @@ def gldas_variables():
         }
 
 
-def wms_colors():
-    """
-    Color options usable by thredds wms
-    """
-    return [
-        ('SST-36', 'sst_36'),
-        ('Greyscale', 'greyscale'),
-        ('Rainbow', 'rainbow'),
-        ('OCCAM', 'occam'),
-        ('OCCAM Pastel', 'occam_pastel-30'),
-        ('Red-Blue', 'redblue'),
-        ('NetCDF Viewer', 'ncview'),
-        ('ALG', 'alg'),
-        ('ALG 2', 'alg2'),
-        ('Ferret', 'ferret'),
-        # ('Probability', 'prob'),
-        # ('White-Blue', whiteblue'),
-        # ('Grace', 'grace'),
-        ]
-
-
 def timecoverage():
     """
     Time intervals of GLDAS data
@@ -91,25 +84,46 @@ def timecoverage():
     ]
 
 
-def app_configuration():
+def wms_colors():
     """
-    Gets the settings for the app for use in other functions and ajax for leaflet
-    Dependencies: os, App (app)
+    Color options usable by thredds wms
     """
-    return {
-        'app_wksp_path': os.path.join(LdasCentral.get_app_workspace().path, ''),
-        'threddsurl': LdasCentral.get_custom_setting("Thredds WMS URL"),
-        'geoserverurl': LdasCentral.get_custom_setting("Geoserver Workspace URL"),
-        'threddsdatadir': LdasCentral.get_custom_setting("Local Thredds Folder Path"),
-    }
+    return [
+        ('SST-36', 'sst_36'),
+        ('Greyscale', 'greyscale'),
+        ('Rainbow', 'rainbow'),
+        ('OCCAM', 'occam'),
+        ('OCCAM Pastel', 'occam_pastel-30'),
+        ('Red-Blue', 'redblue'),
+        ('NetCDF Viewer', 'ncview'),
+        ('ALG', 'alg'),
+        ('ALG 2', 'alg2'),
+        ('Ferret', 'ferret'),
+        # ('Probability', 'prob'),
+        # ('White-Blue', whiteblue'),
+        # ('Grace', 'grace'),
+        ]
 
 
-def worldregions():
-    """
-    Populates the drop down menu with the list of available shapefiles to use for averaging
-    Dependencies: os, App (app)
-    """
-    folders = os.listdir(os.path.join(LdasCentral.get_app_workspace().path, 'shapefiles'))
-    options = [(folder, folder) for folder in folders if not folder.startswith('.')]
-    options.sort()
-    return options
+def geojson_colors():
+    return [
+        ('White', '#ffffff'),
+        ('Red', '#ff0000'),
+        ('Green', '#00ff00'),
+        ('Blue', '#0000ff'),
+        ('Black', '#000000'),
+        ('Pink', '#ff69b4'),
+        ('Orange', '#ffa500'),
+        ('Teal', '#008080'),
+        ('Purple', '#800080'),
+    ]
+
+
+def get_charttypes():
+    return [
+        ('Full Timeseries (Single-Line Plot)', 'timeseries'),
+        ('Monthly Analysis (Box Plot)', 'monthbox'),
+        ('Monthly Analysis (Multi-Line Plot)', 'monthmulti'),
+        ('Yearly Analysis (Box Plot)', 'yearbox'),
+        ('Yearly Analysis (Multi-Line Plot)', 'yearmulti'),
+    ]

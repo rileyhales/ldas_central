@@ -16,7 +16,11 @@ class LdasCentral(TethysAppBase):
     tags = ''
     enable_feedback = False
     feedback_emails = []
-    version = 'Version 1.0.1 - 14 May 2019'
+    youtubelink = ''
+    githublink = ''
+    gldaslink = 'https://disc.gsfc.nasa.gov/datasets/GLDAS_NOAH025_M_V2.1/summary?keywords=gldas'
+    version = 'Version 1.1.0 - 17 May 2019'
+
 
     def url_maps(self):
         """
