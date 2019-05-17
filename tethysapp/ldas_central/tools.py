@@ -212,8 +212,8 @@ def rastermask_average_gdalwarp(data):
     wrkpath = App.get_app_workspace().path
 
     if data['shapefile'] == 'true':
-        region = data['region']
-        shppath = os.path.join(wrkpath, 'shapefiles', region, region.replace(' ', '') + '.shp')
+        region = data['region'].replace(' ', '').lower()
+        shppath = os.path.join(wrkpath, 'shapefiles', region, region + '.shp')
     else:
         # todo: still under development- turn a geojson into a shapefile
         print('you can\'t do that')
